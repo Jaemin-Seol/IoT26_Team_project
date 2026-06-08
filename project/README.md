@@ -147,8 +147,6 @@ confidence = 0.35
 
 ## 라즈베리파이 핀 번호 기준
 
-이 README에서는 두 가지 번호를 같이 씁니다.
-
 - BCM GPIO 번호: 코드에서 사용하는 번호입니다. 예: `GPIO17`
 - 물리 핀 번호: 라즈베리파이 보드의 실제 40핀 위치입니다. 예: `physical pin 11`
 
@@ -416,7 +414,6 @@ smart_recycling/vision/recycling_rules.py
 "bottle": RecyclingAdvice("plastic", "Bottle", "Check PET", "If it is PET, remove cap/label and rinse.")
 ```
 
-나중에 쓰레기 전용 모델 `best.pt`가 생기면 `config.toml`만 바꾸면 됩니다.
 
 ```toml
 [yolo]
@@ -490,13 +487,5 @@ PIR이 계속 감지될 때:
 1. 센서 앞 움직임이 없는지 확인
 2. 센서의 감도/지연 가변저항을 조정
 3. 테스트 시간을 늘려 안정화 대기
-
-## 발표 데모 추천 순서
-
-1. `../test/test_camera.py`로 카메라 촬영 확인
-2. `main.py --once --no-lcd`로 카메라와 YOLO 인식 확인
-3. `../test/test_lcd.py`로 LCD 출력 확인
-4. `../test/test_motion.py`와 `../test/test_ultrasonic.py`로 센서 확인
-5. `main.py`로 전체 통합 시연
 
 커스텀 모델을 만들지 않는 경우, 시연 물체는 `bottle`처럼 COCO YOLO가 잘 인식하는 물체를 사용하는 것이 안정적입니다.
