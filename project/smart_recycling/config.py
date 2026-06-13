@@ -92,6 +92,14 @@ class SensorsConfig:
 
 
 @dataclass
+class FirebaseConfig:
+    enabled: bool = False
+    url: str = ""
+    timeout_seconds: float = 5.0
+    min_interval_seconds: float = 5.0
+
+
+@dataclass
 class Config:
     app: AppConfig = field(default_factory=AppConfig)
     camera: CameraConfig = field(default_factory=CameraConfig)
@@ -99,6 +107,7 @@ class Config:
     display: DisplayConfig = field(default_factory=DisplayConfig)
     lcd: LcdConfig = field(default_factory=LcdConfig)
     sensors: SensorsConfig = field(default_factory=SensorsConfig)
+    firebase: FirebaseConfig = field(default_factory=FirebaseConfig)
 
 # Convert a string or Path into an expanded Path object
 def _path(value: str | Path) -> Path:
@@ -147,6 +156,8 @@ def load_config(path: str | Path = "config.toml") -> Config:
     _update_dataclass(config.sensors.ultrasonic, sensors_data.get("ultrasonic", {}))
     _update_dataclass(config.sensors.temp_humidity, sensors_data.get("temp_humidity", {}))
     _update_dataclass(config.sensors.bin_ultrasonic, sensors_data.get("bin_ultrasonic", {}))
+
+    _update_dataclass(config.firebase, data.get("firebase", {}))
 
     model_path = Path(config.yolo.model).expanduser()
     if not model_path.is_absolute():

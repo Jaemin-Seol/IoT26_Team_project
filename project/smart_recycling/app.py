@@ -4,13 +4,14 @@ import argparse
 import sys
 import time
 from dataclasses import asdict
+from datetime import datetime
 from pathlib import Path
 
 from smart_recycling.camera import PiCamera
 from smart_recycling.config import Config, load_config
 from smart_recycling.display import build_display
 from smart_recycling.sensors import SensorSuite, build_sensors
-from smart_recycling.storage import EventLogger
+from smart_recycling.storage import EventLogger, FirebaseClient
 from smart_recycling.vision import YoloClassifier
 
 
@@ -37,6 +38,18 @@ class RecyclingApp:
             top_k=config.yolo.top_k,
         )
         self.logger = EventLogger(config.app.log_path)
+        # firebase
+        self.firebase: FirebaseClient | None = (
+            FirebaseClient(
+                config.firebase.url,
+                config.firebase.timeout_seconds,
+                config.firebase.min_interval_seconds,
+            )
+            if config.firebase.enabled and config.firebase.url
+            else None
+        )
+        self._waste_counts: dict[str, int] = {}
+        self._total_count: int = 0
 
     def close(self) -> None:
         self.sensors.close()
@@ -212,6 +225,23 @@ class RecyclingApp:
                 "environment": env,
             }
         )
+
+        if result.matched_label:
+            key = result.advice.line1
+            self._waste_counts[key] = self._waste_counts.get(key, 0) + 1
+            self._total_count += 1
+        
+        # send data
+        if self.firebase is not None:
+            record = {
+                "timestamp": datetime.now().isoformat(timespec="seconds"),
+                "temperature": env.get("temperature_c"),
+                "humidity": env.get("humidity_pct"),
+                "capacity": env.get("bin_fill_pct"),
+                "total_count": self._total_count,
+                "waste_types": dict(self._waste_counts),
+            }
+            self.firebase.push_record(record)
     # Load an existing image from disk
     @staticmethod
     def _load_image(path: Path):
