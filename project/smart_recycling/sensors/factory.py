@@ -15,6 +15,10 @@ class SensorSuite:
     pir: object | None = None
     # ultrasonic sensor
     ultrasonic: object | None = None
+    # temperature and humidity sensor
+    temp_humidity: object | None = None
+    # bin ultrasonic sensor for capacity
+    bin_ultrasonic: object | None = None
 
     # clear if program ends
     def close(self) -> None:
@@ -47,4 +51,21 @@ def build_sensors(config: Config, mock: bool = False) -> SensorSuite:
             samples=config.sensors.ultrasonic.samples,                  # number of samples
             sample_delay_seconds=config.sensors.ultrasonic.sample_delay_seconds, # Measurement interval
         )
-    return SensorSuite(pir=pir, ultrasonic=ultrasonic)
+    
+    # create temp_humidity if it is enabled
+    if config.sensors.temp_humidity.enabled:
+        temp_humidity = TempHumiditySensor(config.sensors.temp_humidity.pin)
+ 
+    # create bin_ultrasonic if it is enabled
+    if config.sensors.bin_ultrasonic.enabled:
+        bin_ultrasonic = BinUltrasonicSensor(
+            trigger_pin=config.sensors.bin_ultrasonic.trigger_pin,
+            echo_pin=config.sensors.bin_ultrasonic.echo_pin,
+            bin_depth_cm=config.sensors.bin_ultrasonic.bin_depth_cm,
+            full_threshold_cm=config.sensors.bin_ultrasonic.full_threshold_cm,
+            timeout_seconds=config.sensors.bin_ultrasonic.timeout_seconds,
+            samples=config.sensors.bin_ultrasonic.samples,
+            sample_delay_seconds=config.sensors.bin_ultrasonic.sample_delay_seconds,
+        )
+    return SensorSuite(pir=pir, ultrasonic=ultrasonic, temp_humidity=temp_humidity,
+        bin_ultrasonic=bin_ultrasonic,)
