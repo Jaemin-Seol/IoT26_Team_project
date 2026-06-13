@@ -30,6 +30,7 @@ class YoloClassifier:
         self.top_k = top_k
         self._model = None
 
+    # load the YOLO model on first use
     @property
     def model(self):
         if self._model is None:
@@ -38,6 +39,7 @@ class YoloClassifier:
             self._model = YOLO(self.model_path)
         return self._model
 
+    # Run inference and generate an annotated result image
     def classify(self, image: Any, output_dir: Path) -> ClassificationResult:
         import cv2
         import time
@@ -66,7 +68,7 @@ class YoloClassifier:
             detections=detections,
             annotated_path=annotated_path,
         )
-
+     # Prefer a detection that maps to a known recycling category
     @staticmethod
     def _choose_label(detections: list[Detection]) -> str | None:
         if not detections:

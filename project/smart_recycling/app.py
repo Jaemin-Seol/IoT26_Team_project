@@ -50,6 +50,7 @@ class RecyclingApp:
             image, raw_path = self.camera.capture(self.config.app.output_dir)
         self._classify_and_report(image, raw_path, sensor_snapshot={})
 
+    # Main runtime loop for sensor-driven classification
     def run_forever(self) -> None:
         if not self.sensors.pir and not self.sensors.ultrasonic:
             raise RuntimeError("No sensors enabled. Use --once or --mock-sensors, or enable sensors in config.toml.")
@@ -75,6 +76,7 @@ class RecyclingApp:
         except KeyboardInterrupt:
             print("\n[INFO] stopped")
 
+    # Wait until motion and a valid target object are detected
     def _wait_for_candidate(self) -> dict | None:
         pir = self.sensors.pir
         ultrasonic = self.sensors.ultrasonic
@@ -100,7 +102,8 @@ class RecyclingApp:
             self.display.show("No item", "Try again")
             time.sleep(1.0)
             self.display.show("Ready", "Place item")
-
+    
+    # Verify that the object remains stable before capture
     def _wait_for_stable_object(self) -> dict | None:
         cfg = self.config.sensors.ultrasonic
         deadline = time.monotonic() + self.config.app.max_wait_after_motion_seconds
@@ -141,7 +144,8 @@ class RecyclingApp:
             "distance_cm": round(stable_distance, 2) if stable_distance else None,
             "stable": False,
         } if stable_distance is not None else None
-
+    
+    # Recheck object presence during the capture countdown
     def _countdown_with_recheck(self) -> bool:
         ultrasonic = self.sensors.ultrasonic
         threshold = self.config.sensors.ultrasonic.object_distance_cm
@@ -156,6 +160,7 @@ class RecyclingApp:
         self.display.show("Capturing", "Do not move")
         return True
 
+    # Run inference, display the result, and save an event log
     def _classify_and_report(self, image, raw_path: Path, sensor_snapshot: dict) -> None:
         self.display.show("AI checking", "Please wait")
         result = self.classifier.classify(image, self.config.app.output_dir)
@@ -176,7 +181,7 @@ class RecyclingApp:
                 "sensors": sensor_snapshot,
             }
         )
-
+    # Load an existing image from disk
     @staticmethod
     def _load_image(path: Path):
         import cv2
@@ -187,6 +192,7 @@ class RecyclingApp:
         return image, path
 
 
+# Parse command-line options
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="AIoT Smart Recycling System")
     parser.add_argument("--config", default="config.toml")
@@ -200,7 +206,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--disable-ultrasonic", action="store_true")
     return parser.parse_args(argv)
 
-
+# Application entry point
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     config = load_config(args.config)

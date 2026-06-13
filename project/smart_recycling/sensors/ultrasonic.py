@@ -4,6 +4,7 @@ import statistics
 import time
 
 
+# Ultrasonic distance sensor control class
 class UltrasonicSensor:
     """HC-SR04 distance sensor using BCM pin numbering.
 
@@ -34,10 +35,13 @@ class UltrasonicSensor:
         GPIO.output(trigger_pin, False)
         time.sleep(0.05)
 
+    # Measure distance in centimeters
     def read_cm(self) -> float | None:
         GPIO = self.GPIO
+
         GPIO.output(self.trigger_pin, False)
         time.sleep(0.00002)
+
         GPIO.output(self.trigger_pin, True)
         time.sleep(0.00001)
         GPIO.output(self.trigger_pin, False)
@@ -59,15 +63,22 @@ class UltrasonicSensor:
         duration = pulse_end - pulse_start
         return (duration * 34300.0) / 2.0
 
+    # Return the median of multiple measurements
     def read_median_cm(self) -> float | None:
         values: list[float] = []
+
         for _ in range(self.samples):
             value = self.read_cm()
+
+            # Keep only valid measurement values
             if value is not None and 1.0 <= value <= 400.0:
                 values.append(value)
+
             time.sleep(self.sample_delay_seconds)
+
         if not values:
             return None
+
         return float(statistics.median(values))
 
     def close(self) -> None:

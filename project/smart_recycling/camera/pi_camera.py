@@ -20,7 +20,10 @@ class PiCamera:
         import cv2
         from picamera2 import Picamera2
 
+        # Create output directory if it doesn't exist.
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Generate a timestamped filename.
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         image_path = output_dir / f"capture_{timestamp}.jpg"
 
@@ -28,13 +31,21 @@ class PiCamera:
         config = picam2.create_still_configuration(
             main={"size": (self.width, self.height), "format": "RGB888"}
         )
+
+        # Start the camera and allow it to warm up.
         picam2.configure(config)
         picam2.start()
         time.sleep(self.warmup_seconds)
+
         frame_rgb = picam2.capture_array()
+
         picam2.stop()
         picam2.close()
 
+        # Convert RGB to BGR for OpenCV compatibility.
         frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+
+        # Save the captured image.
         cv2.imwrite(str(image_path), frame_bgr)
+
         return frame_bgr, image_path

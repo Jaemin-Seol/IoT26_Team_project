@@ -81,11 +81,11 @@ class Config:
     lcd: LcdConfig = field(default_factory=LcdConfig)
     sensors: SensorsConfig = field(default_factory=SensorsConfig)
 
-
+# Convert a string or Path into an expanded Path object
 def _path(value: str | Path) -> Path:
     return Path(value).expanduser()
 
-
+#I2C addresses
 def _int_address(value: str | int) -> int:
     if isinstance(value, int):
         return value
@@ -102,7 +102,7 @@ def _update_dataclass(instance: Any, values: dict[str, Any], path_fields: set[st
         else:
             setattr(instance, key, value)
 
-
+# Load and merge settings from a TOML configuration file
 def load_config(path: str | Path = "config.toml") -> Config:
     config = Config()
     path = Path(path)

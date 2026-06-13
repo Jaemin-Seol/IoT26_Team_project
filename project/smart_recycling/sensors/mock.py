@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 
-
+# 가짜 센서 코드 (테스트용)
 class MockPirSensor:
     def __init__(self, active_every_seconds: float = 10.0) -> None:
         self.started = time.monotonic()
