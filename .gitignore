@@ -3,3 +3,9 @@ __pycache__/
 *.pyo
 *.pt
 events.jsonl
+.env
+.vscode
+.venv/
+env/
+venv/
+Gachon_logo.png
