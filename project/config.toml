@@ -1,0 +1,45 @@
+[app]
+output_dir = "~/Pictures/aiot-smart-recycling"
+log_path = "~/IoT26_Team_project/project/events.jsonl"
+cooldown_seconds = 6.0
+countdown_seconds = 3
+stable_required_seconds = 1.2
+max_wait_after_motion_seconds = 8.0
+poll_interval_seconds = 0.12
+
+[camera]
+enabled = true
+width = 1280
+height = 720
+warmup_seconds = 1.0
+
+[yolo]
+model = "yolov8n.pt"
+confidence = 0.35
+imgsz = 640
+top_k = 5
+
+[display]
+enabled = true
+kind = "lcd"
+fallback_console = true
+
+[lcd]
+bus = 1
+addresses = ["0x27", "0x3f"]
+columns = 16
+rows = 2
+
+[sensors.pir]
+enabled = true
+pin = 17
+
+[sensors.ultrasonic]
+enabled = true
+trigger_pin = 23
+echo_pin = 24
+object_distance_cm = 18.0
+stable_tolerance_cm = 2.5
+samples = 5
+sample_delay_seconds = 0.06
+timeout_seconds = 0.04
