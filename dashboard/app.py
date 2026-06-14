@@ -19,7 +19,7 @@ from google import genai
 # Initialize global variables
 INSIGHT_REFRESH_INTERVAL = 300 # 5 minute
 ENABLE_AI = False
-USE_MOCK_DATA = True
+USE_MOCK_DATA = False
 
 load_dotenv()
 FIREBASE_URL = os.getenv("FIREBASE_URL")
@@ -135,6 +135,8 @@ def get_status():
             records_dict = response.json() or {}
             records = list(records_dict.values())
 
+            print(f"[Firebase] Read success: {len(records)} records")
+
         if not records:
             raise ValueError("No records found")
 
@@ -160,6 +162,7 @@ def get_status():
         })
 
     except Exception as e:
+        print(f"[Firebase] Read failed: {e}")
         return jsonify({
             "success": False,
             "error": str(e)
