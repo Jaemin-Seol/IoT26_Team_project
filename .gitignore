@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pt
+!yolo26s_Finetuned.pt
 events.jsonl
 .env
 .vscode
