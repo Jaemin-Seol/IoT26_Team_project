@@ -1,0 +1,98 @@
+<!--
+==================================================
+Gachon University
+Introduction to Internet of Things (13966_001)
+2026-1 Semester
+Term Project Dashboard HTML
+Team C
+==================================================
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Recycling Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <main class="dashboard">
+        <header class="header card">
+            <img
+                src="{{ url_for('static', filename='images/Gachon_logo.png') }}"
+                alt="Logo"
+                class="logo">
+            <div>
+                <h1>Smart Recycling Dashboard</h1>
+                <p>Gachon University IoT(2026-1) Team C</p>
+            </div>
+            <span id="status-badge" class="badge offline">OFFLINE</span>
+        </header>
+
+        <section class="summary-grid">
+            <div class="card summary-card">
+                <p>Temperature</p>
+                <h2 id="temperature">-- °C</h2>
+            </div>
+
+            <div class="card summary-card">
+                <p>Humidity</p>
+                <h2 id="humidity">-- %</h2>
+            </div>
+
+            <div class="card summary-card">
+                <p>Total Detection</p>
+                <h2 id="total-count">--</h2>
+            </div>
+
+            <div class="card summary-card">
+                <p>Bin Capacity</p>
+                <h2 id="bin-capacity">-- %</h2>
+            </div>
+        </section>
+
+        <section class="main-grid">
+            <div class="card chart-card">
+                <h3>Recent Detection Count</h3>
+                <canvas id="recentChart"></canvas>
+            </div>
+
+            <div class="card chart-card">
+                <h3>Waste Type Ratio</h3>
+                <canvas id="wastePieChart"></canvas>
+            </div>
+
+            <aside class="card insight-card">
+                <h3>Bin Status</h3>
+
+                <div class="capacity-box">
+                    <div class="capacity-header">
+                        <span>Current Capacity</span>
+                        <strong id="capacity-text">--%</strong>
+                    </div>
+                    <div class="progress">
+                        <div id="capacity-bar" class="progress-bar"></div>
+                    </div>
+                    <p id="bin-status" class="status-text">Waiting for data...</p>
+                </div>
+
+                <hr>
+
+                <h3>AI Insight</h3>
+                <p id="ai-insight" class="insight-text">
+                    No insight data yet.
+                </p>
+
+                <p class="insight-disclaimer">
+                    AI insights are powered by Google's Gemini model. Gemini is AI and can make mistakes.
+                </p>
+            </aside>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
