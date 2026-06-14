@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Term Project Main python app
+# ==================================================
 from __future__ import annotations
 
 import argparse
@@ -6,6 +14,8 @@ import time
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
+import cv2
+import threading
 
 from smart_recycling.camera import PiCamera
 from smart_recycling.config import Config, load_config
@@ -16,6 +26,7 @@ from smart_recycling.vision import YoloClassifier
 
 
 class RecyclingApp:
+    # Initialize class - Config, Camera, Classifier, Logger, Firebase and more
     def __init__(
         self,
         config: Config,
@@ -38,7 +49,6 @@ class RecyclingApp:
             top_k=config.yolo.top_k,
         )
         self.logger = EventLogger(config.app.log_path)
-        # firebase
         self.firebase: FirebaseClient | None = (
             FirebaseClient(
                 config.firebase.url,
@@ -48,27 +58,44 @@ class RecyclingApp:
             if config.firebase.enabled and config.firebase.url
             else None
         )
-        self._waste_counts: dict[str, int] = {}
+        self._waste_counts = {
+            "Battery": 1,
+            "Food Waste": 20,
+            "Cardboard": 0,
+            "Clothes": 1,
+            "Glass": 100,
+            "Metal": 0,
+            "Paper": 300,
+            "Plastic": 0,
+            "General Waste": 0,
+            "Vinyl": 0,
+        }
         self._total_count: int = 0
 
+    # Clean up
     def close(self) -> None:
         self.sensors.close()
         self.display.close()
 
+    # One time test
     def run_once(self, image_path: str | None = None) -> None:
         if image_path:
             image, raw_path = self._load_image(Path(image_path).expanduser())
         else:
             self.display.show("Capturing", "Please wait")
             image, raw_path = self.camera.capture(self.config.app.output_dir)
-        self._classify_and_report(image, raw_path, sensor_snapshot={})
+        self._classify(image, raw_path)
 
     # Main runtime loop for sensor-driven classification
     def run_forever(self) -> None:
         if not self.sensors.pir and not self.sensors.ultrasonic:
             raise RuntimeError("No sensors enabled. Use --once or --mock-sensors, or enable sensors in config.toml.")
 
+        # Generate Thread to push data to cloud
+        threading.Thread(target=self._firebase_worker, daemon=True,).start()
+
         self.display.show("Ready", "Place item")
+        self.sensors.lid.close()
         print("[INFO] System ready. Press Ctrl-C to stop.")
         try:
             while True:
@@ -77,15 +104,16 @@ class RecyclingApp:
                     continue
                 if not self._countdown_with_recheck():
                     self.display.show("Cancelled", "Item moved")
-                    print("[INFO] Capture cancelled because the item moved.")
+                    print("[INFO] Capture cancelled because the item was moved.")
                     time.sleep(1.0)
                     self.display.show("Ready", "Place item")
                     continue
 
                 image, raw_path = self.camera.capture(self.config.app.output_dir)
-                self._classify_and_report(image, raw_path, sensor_snapshot=candidate)
+                self._classify(image, raw_path)
                 time.sleep(self.config.app.cooldown_seconds)
                 self.display.show("Ready", "Place item")
+                self.sensors.lid.close()
         except KeyboardInterrupt:
             print("\n[INFO] stopped")
 
@@ -101,7 +129,7 @@ class RecyclingApp:
                 continue
 
             if pir is not None:
-                print("[INFO] Motion detected. Checking target area.")
+                print("[INFO] Motion detected. Checking for target area.")
                 self.display.show("Motion", "Checking area")
 
             if ultrasonic is None:
@@ -198,21 +226,20 @@ class RecyclingApp:
  
 
     # Run inference, display the result, and save an event log
-    def _classify_and_report(self, image, raw_path: Path, sensor_snapshot: dict) -> None:
-        self.display.show("AI checking", "Please wait")
+    def _classify(self, image, raw_path: Path) -> None:
+        self.display.show("Classifying...", "Please wait")
         result = self.classifier.classify(image, self.config.app.output_dir)
-        env = self._read_environment_snapshot()
-        # if bin is full print it on lcd
-        if env.get("bin_is_full"):
-            self.display.show("Bin is FULL", "Please empty!")
-            print("[WARN] Bin is full!")
-            time.sleep(2.0)
         self.display.show(result.advice.line1, result.advice.line2)
+        self.sensors.lid.open()
+
         print(f"[RESULT] {result.advice.line1} / {result.advice.line2}")
         print(f"[INFO] image: {raw_path}")
         print(f"[INFO] annotated: {result.annotated_path}")
-        for detection in result.detections:
-            print(f"[DETECT] {detection.label} {detection.confidence:.2f}")
+
+        if result.matched_label:
+            print(f"[CLASS] {result.matched_label} {result.confidence:.2f}")
+        else:
+            print("[CLASS] No confident class")
 
         self.logger.write(
             {
@@ -220,9 +247,8 @@ class RecyclingApp:
                 "annotated_path": str(result.annotated_path),
                 "matched_label": result.matched_label,
                 "advice": asdict(result.advice),
-                "detections": [asdict(item) for item in result.detections],
-                "sensors": sensor_snapshot,
-                "environment": env,
+                "class_id": result.class_id,
+                "confidence": result.confidence,
             }
         )
 
@@ -230,9 +256,11 @@ class RecyclingApp:
             key = result.advice.line1
             self._waste_counts[key] = self._waste_counts.get(key, 0) + 1
             self._total_count += 1
-        
-        # send data
+    
+    # Read sensors and send data to firebase RDB
+    def _push_status(self) -> None:
         if self.firebase is not None:
+            env = self._read_environment_snapshot()
             record = {
                 "timestamp": datetime.now().isoformat(timespec="seconds"),
                 "temperature": env.get("temperature_c"),
@@ -241,16 +269,27 @@ class RecyclingApp:
                 "total_count": self._total_count,
                 "waste_types": dict(self._waste_counts),
             }
-            self.firebase.push_record(record)
+            try:
+                self.firebase.push_record(record)
+            except Exception as exc:
+                print(f"[WARN] Firebase push failed: {exc}")
+
     # Load an existing image from disk
     @staticmethod
     def _load_image(path: Path):
-        import cv2
-
         image = cv2.imread(str(path))
         if image is None:
             raise RuntimeError(f"Could not read image: {path}")
         return image, path
+    
+    # thred to push env data
+    def _firebase_worker(self):
+        while True:
+            self._push_status()
+            print(
+                f"[Firebase Worker] alive "
+            )
+            time.sleep(10)
 
 
 # Parse command-line options
@@ -297,6 +336,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.once or args.image:
             app.run_once(args.image)
         else:
+            # Main code execution loop
             app.run_forever()
     except Exception as exc:
         print(f"[ERROR] {type(exc).__name__}: {exc}", file=sys.stderr)

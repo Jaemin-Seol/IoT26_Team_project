@@ -14,7 +14,7 @@ height = 720
 warmup_seconds = 1.0
 
 [yolo]
-model = "yolov8n.pt"
+model = "yolo26s_Finetuned.pt"
 confidence = 0.35
 imgsz = 640
 top_k = 5
@@ -53,8 +53,12 @@ echo_pin = 8
 bin_depth_cm = 40.0
 full_threshold_cm = 10.0
 
+[sensors.lid]
+pin = 18
+enabled = true
+
 [firebase]
 enabled = true
-url = "https://smarttrash-dbf88-default-rtdb.asia-southeast1.firebasedatabase.app/"
+url = "https://smarttrash-dbf88-default-rtdb.asia-southeast1.firebasedatabase.app/dashboard/records.json"
 timeout_seconds = 5.0
 min_interval_seconds = 5.0

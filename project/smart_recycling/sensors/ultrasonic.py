@@ -1,8 +1,13 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Ultrasonic sencor (detecction)
+# ==================================================
 from __future__ import annotations
-
 import statistics
 import time
-
 
 # Ultrasonic distance sensor control class
 class UltrasonicSensor:

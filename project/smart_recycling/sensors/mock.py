@@ -1,8 +1,14 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Mock sensors for testing
+# ==================================================
 from __future__ import annotations
-
 import time
 
-# 가짜 센서 코드 (테스트용)
+# Mock sensor for testing
 class MockPirSensor:
     def __init__(self, active_every_seconds: float = 10.0) -> None:
         self.started = time.monotonic()

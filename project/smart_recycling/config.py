@@ -1,5 +1,11 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Term Project config.py
+# ==================================================
 from __future__ import annotations
-
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -27,7 +33,7 @@ class CameraConfig:
 
 @dataclass
 class YoloConfig:
-    model: str = "yolov8n.pt"
+    model: str = "yolo26s_Finetuned.pt"
     confidence: float = 0.35
     imgsz: int = 640
     top_k: int = 5
@@ -81,14 +87,19 @@ class BinUltrasonicConfig:
     timeout_seconds: float = 0.04
     samples: int = 5
     sample_delay_seconds: float = 0.06
- 
 
+@dataclass
+class LidConfig:
+    enabled: bool = True
+    pin: int = 18
+ 
 @dataclass
 class SensorsConfig:
     pir: PirConfig = field(default_factory=PirConfig)
     ultrasonic: UltrasonicConfig = field(default_factory=UltrasonicConfig)
     temp_humidity: TempHumidityConfig = field(default_factory=TempHumidityConfig)
     bin_ultrasonic: BinUltrasonicConfig = field(default_factory=BinUltrasonicConfig)
+    lid: LidConfig = field(default_factory=LidConfig)
 
 
 @dataclass
@@ -97,7 +108,6 @@ class FirebaseConfig:
     url: str = ""
     timeout_seconds: float = 5.0
     min_interval_seconds: float = 5.0
-
 
 @dataclass
 class Config:
@@ -156,6 +166,7 @@ def load_config(path: str | Path = "config.toml") -> Config:
     _update_dataclass(config.sensors.ultrasonic, sensors_data.get("ultrasonic", {}))
     _update_dataclass(config.sensors.temp_humidity, sensors_data.get("temp_humidity", {}))
     _update_dataclass(config.sensors.bin_ultrasonic, sensors_data.get("bin_ultrasonic", {}))
+    _update_dataclass(config.sensors.lid, sensors_data.get("lid", {}))
 
     _update_dataclass(config.firebase, data.get("firebase", {}))
 

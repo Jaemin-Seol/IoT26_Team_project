@@ -1,0 +1,24 @@
+Notice for yolo26s_Finetuned.pt
+
+The model architecture is based on the YOLO family of object detection and classification models.
+
+Training and fine-tuning were performed using the Ultralytics implementation of YOLO.
+
+For information regarding the Ultralytics software license, please refer to:
+https://www.ultralytics.com/license
+
+This model was fine-tuned using datasets that include content licensed under CC BY-SA 4.0, CC BY, and MIT licenses.
+
+Datasets used:
+* https://www.kaggle.com/datasets/vencerlanz09/plastic-paper-garbage-bag-synthetic-images
+* https://www.kaggle.com/datasets/sumn2u/garbage-classification-v2
+* https://www.kaggle.com/datasets/joebeachcapital/realwaste
+
+CC BY-SA 4.0 License:
+https://creativecommons.org/licenses/by-sa/4.0/
+
+This notice applies only to the model file yolo26s_Finetuned.pt.
+
+Other files in this project may be subject to separate licenses, notices, or terms where applicable. No additional rights or restrictions regarding other project components are implied by this notice.
+
+Special thanks to the authors and contributors of the original datasets.

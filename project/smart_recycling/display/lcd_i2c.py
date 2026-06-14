@@ -1,7 +1,12 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# LCD display
+# ==================================================
 from __future__ import annotations
-
 import time
-
 
 class I2cLcd:
     ENABLE = 0x04             # Enable signal

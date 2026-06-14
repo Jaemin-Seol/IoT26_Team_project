@@ -1,11 +1,13 @@
+#!/usr/bin/env python3
 # ==================================================
 # Gachon University
 # Introduction to Internet of Things (13966_001)
 # 2026-1 Semester Team C
 #
-# storage Package Initialization
+# Term Project Entrypoint
 # ==================================================
-from smart_recycling.storage.event_logger import EventLogger
-from smart_recycling.storage.firebase_api import FirebaseClient
 
-__all__ = ["EventLogger", "FirebaseClient"]
+from smart_recycling.app import main
+
+if __name__ == "__main__":
+    raise SystemExit(main())

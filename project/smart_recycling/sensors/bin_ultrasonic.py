@@ -1,5 +1,11 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Trashbin ultrasonic sensor (capacity)
+# ==================================================
 from __future__ import annotations
-
 from smart_recycling.sensors.ultrasonic import UltrasonicSensor
 
 # measure bin dept for capacity

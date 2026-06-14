@@ -1,11 +1,19 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Sensors factory
+# ==================================================
 from __future__ import annotations
-
 from dataclasses import dataclass
-
 from smart_recycling.config import Config
 from smart_recycling.sensors.mock import MockPirSensor, MockUltrasonicSensor
 from smart_recycling.sensors.pir import PirSensor
 from smart_recycling.sensors.ultrasonic import UltrasonicSensor
+from .bin_ultrasonic import BinUltrasonicSensor
+from .temp_humidity import TempHumiditySensor
+from .servo import ServoLid
 
 # Code for creating and managing sensors
 # Managing all sensors
@@ -19,10 +27,13 @@ class SensorSuite:
     temp_humidity: object | None = None
     # bin ultrasonic sensor for capacity
     bin_ultrasonic: object | None = None
+    # Servo
+    lid: object | None = None
 
     # clear if program ends
     def close(self) -> None:
-        for sensor in (self.pir, self.ultrasonic):
+        for sensor in (self.pir, self.ultrasonic, 
+                       self.temp_humidity, self.bin_ultrasonic, self.lid):
             if sensor is not None:
                 try:
                     sensor.close()
@@ -37,6 +48,9 @@ def build_sensors(config: Config, mock: bool = False) -> SensorSuite:
 
     pir = None
     ultrasonic = None
+    temp_humidity = None
+    bin_ultrasonic = None
+    lid = None
 
     # create pir if it is enable
     if config.sensors.pir.enabled:
@@ -67,5 +81,9 @@ def build_sensors(config: Config, mock: bool = False) -> SensorSuite:
             samples=config.sensors.bin_ultrasonic.samples,
             sample_delay_seconds=config.sensors.bin_ultrasonic.sample_delay_seconds,
         )
+
+    if config.sensors.lid.enabled:
+        lid = ServoLid(config.sensors.lid.pin)
+
     return SensorSuite(pir=pir, ultrasonic=ultrasonic, temp_humidity=temp_humidity,
-        bin_ultrasonic=bin_ultrasonic,)
+        bin_ultrasonic=bin_ultrasonic, lid=lid,)

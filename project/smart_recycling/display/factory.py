@@ -1,11 +1,15 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Display factory
+# ==================================================
 from __future__ import annotations
-
 from pathlib import Path
-
 from smart_recycling.config import Config
 from smart_recycling.display.console_display import ConsoleDisplay
 from smart_recycling.display.lcd_i2c import I2cLcd
-
 
 def build_display(config: Config, force_console: bool = False):
 

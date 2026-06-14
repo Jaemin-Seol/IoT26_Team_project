@@ -1,8 +1,13 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Camera
+# ==================================================
 from __future__ import annotations
-
 import time
 from pathlib import Path
-
 
 class PiCamera:
     def __init__(self, width: int = 1280, height: int = 720, warmup_seconds: float = 1.0) -> None:
@@ -16,6 +21,7 @@ class PiCamera:
 
         return Picamera2.global_camera_info()
 
+    # Take photo
     def capture(self, output_dir: Path):
         import cv2
         from picamera2 import Picamera2
@@ -43,9 +49,9 @@ class PiCamera:
         picam2.close()
 
         # Convert RGB to BGR for OpenCV compatibility.
-        frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+        # frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
 
         # Save the captured image.
-        cv2.imwrite(str(image_path), frame_bgr)
+        cv2.imwrite(str(image_path), frame_rgb)
 
-        return frame_bgr, image_path
+        return frame_rgb, image_path

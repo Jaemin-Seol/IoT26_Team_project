@@ -3,22 +3,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+import cv2
+import time
 
 from smart_recycling.vision.recycling_rules import RecyclingAdvice, advice_for
-
-
-@dataclass(frozen=True)
-class Detection:
-    label: str
-    confidence: float
-    class_id: int
-
 
 @dataclass(frozen=True)
 class ClassificationResult:
     matched_label: str | None
+    confidence: float | None
+    class_id: int | None
     advice: RecyclingAdvice
-    detections: list[Detection]
     annotated_path: Path
 
 
@@ -36,45 +31,68 @@ class YoloClassifier:
         if self._model is None:
             from ultralytics import YOLO
 
+            from pathlib import Path
+            print("cwd =", Path.cwd())
+            print("model =", self.model_path)
+            print("exists =", Path(self.model_path).exists())
+            print("absolute =", Path(self.model_path).resolve())
             self._model = YOLO(self.model_path)
         return self._model
 
     # Run inference and generate an annotated result image
     def classify(self, image: Any, output_dir: Path) -> ClassificationResult:
-        import cv2
-        import time
-
+        #LABEL alias to correct typo
+        LABEL_ALIASES = {
+            "vynil": "vinyl",
+        }
+        # Prepare output directory for result image.
         output_dir.mkdir(parents=True, exist_ok=True)
-        results = self.model.predict(source=image, imgsz=self.imgsz, conf=self.confidence, verbose=False)
+
+        # Run YOLO classification inference.
+        results = self.model.predict(
+            source=image,
+            imgsz=self.imgsz,
+            verbose=False,
+        )
         result = results[0]
 
-        detections: list[Detection] = []
-        for box in result.boxes:
-            class_id = int(box.cls[0])
-            label = str(self.model.names[class_id])
-            confidence = float(box.conf[0])
-            detections.append(Detection(label=label, confidence=confidence, class_id=class_id))
-        detections.sort(key=lambda item: item.confidence, reverse=True)
-        detections = detections[: self.top_k]
+        # Classification models return probabilities in result.probs.
+        probs = result.probs
+        if probs is None:
+            raise RuntimeError(
+                "Model did not return classification probabilities. "
+                "Please check that the loaded model is a YOLO classification model."
+            )
 
-        matched_label = self._choose_label(detections)
+        # Get the most probable class.
+        top1_id = int(probs.top1)
+        label = str(self.model.names[top1_id])
+        confidence = float(probs.data[top1_id])
+
+        # Fix known label typos from the trained model.
+        label = LABEL_ALIASES.get(label, label)
+
+        # Apply confidence threshold.
+        if confidence >= self.confidence:
+            matched_label = label
+            matched_confidence = confidence
+            matched_class_id = top1_id
+        else:
+            matched_label = None
+            matched_confidence = None
+            matched_class_id = None
+
+        # Convert label into recycling advice.
         advice = advice_for(matched_label)
 
+        # Save visualized classification result.
         annotated_path = output_dir / f"annotated_{time.strftime('%Y%m%d_%H%M%S')}.jpg"
         cv2.imwrite(str(annotated_path), result.plot())
+
         return ClassificationResult(
             matched_label=matched_label,
+            confidence=matched_confidence,
+            class_id=matched_class_id,
             advice=advice,
-            detections=detections,
             annotated_path=annotated_path,
         )
-     # Prefer a detection that maps to a known recycling category
-    @staticmethod
-    def _choose_label(detections: list[Detection]) -> str | None:
-        if not detections:
-            return None
-        for detection in detections:
-            advice = advice_for(detection.label)
-            if advice.category != "unknown":
-                return detection.label
-        return detections[0].label

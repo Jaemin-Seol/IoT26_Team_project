@@ -1,3 +1,10 @@
+# ==================================================
+# Gachon University
+# Introduction to Internet of Things (13966_001)
+# 2026-1 Semester Team C
+#
+# Recycling rules
+# ==================================================
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -11,40 +18,75 @@ class RecyclingAdvice:
     detail: str       
 
 RULES: dict[str, RecyclingAdvice] = {
-    # Waste-specific labels for a future custom model.
-    # plastic
-    "plastic": RecyclingAdvice("plastic", "Plastic", "Rinse first", "Rinse and put into plastic bin."),
-    "plastic_bottle": RecyclingAdvice("plastic", "PET Bottle", "Cap off", "Remove cap/label, rinse, and put into PET bin."),
-    "pet": RecyclingAdvice("plastic", "PET Bottle", "Cap off", "Remove cap/label, rinse, and put into PET bin."),
-    # Can
-    "can": RecyclingAdvice("metal", "Can", "Metal bin", "Empty, rinse, and put into metal can bin."),
-    "aluminum_can": RecyclingAdvice("metal", "Can", "Metal bin", "Empty, rinse, and put into metal can bin."),
-    "steel_can": RecyclingAdvice("metal", "Can", "Metal bin", "Empty, rinse, and put into metal can bin."),
-    # paper
-    "paper": RecyclingAdvice("paper", "Paper", "Keep dry", "Keep dry and put into paper bin."),
-    "cardboard": RecyclingAdvice("paper", "Cardboard", "Flatten", "Flatten and put into paper/cardboard bin."),
-    # glass
-    "glass": RecyclingAdvice("glass", "Glass", "Glass bin", "Rinse and put into glass bin."),
-    "glass_bottle": RecyclingAdvice("glass", "Glass Bottle", "Glass bin", "Rinse and put into glass bin."),
-    # food waste
-    "food_waste": RecyclingAdvice("food", "Food Waste", "Drain liquid", "Drain liquid and put into food-waste bin."),
-    # battery or electornics
-    "battery": RecyclingAdvice("battery", "Battery", "Recycle box", "Use a battery collection box."),
-    "electronics": RecyclingAdvice("e_waste", "E-Waste", "Collect box", "Use an e-waste collection box."),
-    # COCO labels from yolov8n.pt. These are demo mappings, not material proof.
-    # demo
-    "bottle": RecyclingAdvice("plastic", "Bottle", "Check PET", "If it is PET, remove cap/label and rinse."),
-    "cup": RecyclingAdvice("unknown", "Cup", "Check material", "Check if paper, plastic, or general waste."),
-    "wine glass": RecyclingAdvice("glass", "Glassware", "Usually trash", "Broken glassware is usually non-recyclable."),
-    "book": RecyclingAdvice("paper", "Book/Paper", "Paper bin", "Remove coated covers if needed."),
-    "cell phone": RecyclingAdvice("e_waste", "E-Waste", "Collect box", "Use an e-waste collection box."),
-    "laptop": RecyclingAdvice("e_waste", "E-Waste", "Collect box", "Use an e-waste collection box."),
-    "keyboard": RecyclingAdvice("e_waste", "E-Waste", "Collect box", "Use an e-waste collection box."),
-    "mouse": RecyclingAdvice("e_waste", "E-Waste", "Collect box", "Use an e-waste collection box."),
-    "remote": RecyclingAdvice("e_waste", "E-Waste", "Collect box", "Use an e-waste collection box."),
-    "banana": RecyclingAdvice("food", "Food Waste", "Drain liquid", "Drain liquid and put into food-waste bin."),
-    "apple": RecyclingAdvice("food", "Food Waste", "Drain liquid", "Drain liquid and put into food-waste bin."),
-    "orange": RecyclingAdvice("food", "Food Waste", "Drain liquid", "Drain liquid and put into food-waste bin."),
+    "battery": RecyclingAdvice(
+        "battery",
+        "Battery",
+        "Battery Box",
+        "Use a battery collection box."
+    ),
+
+    "biological": RecyclingAdvice(
+        "biological",
+        "Food Waste",
+        "Food Bin",
+        "Drain liquid and dispose as food waste."
+    ),
+
+    "cardboard": RecyclingAdvice(
+        "cardboard",
+        "Cardboard",
+        "Paper Bin",
+        "Flatten before disposal."
+    ),
+
+    "clothes": RecyclingAdvice(
+        "clothes",
+        "Clothes",
+        "Donation Bin",
+        "Donate if reusable, otherwise dispose appropriately."
+    ),
+
+    "glass": RecyclingAdvice(
+        "glass",
+        "Glass",
+        "Glass Bin",
+        "Rinse and place in the glass recycling bin."
+    ),
+
+    "metal": RecyclingAdvice(
+        "metal",
+        "Metal",
+        "Metal Bin",
+        "Rinse and place in the metal recycling bin."
+    ),
+
+    "paper": RecyclingAdvice(
+        "paper",
+        "Paper",
+        "Paper Bin",
+        "Keep dry and place in the paper recycling bin."
+    ),
+
+    "plastic": RecyclingAdvice(
+        "plastic",
+        "Plastic",
+        "Plastic Bin",
+        "Rinse and place in the plastic recycling bin."
+    ),
+
+    "trash": RecyclingAdvice(
+        "trash",
+        "General Waste",
+        "Trash Bin",
+        "Dispose as general waste."
+    ),
+
+    "vinyl": RecyclingAdvice(
+        "vinyl",
+        "Vinyl",
+        "Vinyl Bin",
+        "Clean and dry before disposal."
+    ),
 }
 
 UNKNOWN_ADVICE = RecyclingAdvice(
