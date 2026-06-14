@@ -31,3 +31,42 @@ class MockUltrasonicSensor:
 
     def close(self) -> None:
         pass
+
+class MockTempHumiditySensor:
+ 
+    def __init__(self, temperature: float = 25.0, humidity: float = 60.0) -> None:
+        self.temperature = temperature
+        self.humidity = humidity
+ 
+    def read(self) -> tuple[float, float]:
+        return (self.temperature, self.humidity)
+ 
+    def close(self) -> None:
+        pass
+ 
+ 
+class MockBinUltrasonicSensor:
+ 
+    def __init__(
+        self,
+        fill_percent: float = 45.0,
+        bin_depth_cm: float = 40.0,
+        full_threshold_cm: float = 10.0,
+    ) -> None:
+        self.fill_percent = fill_percent
+        self.bin_depth_cm = bin_depth_cm
+        self.full_threshold_cm = full_threshold_cm
+ 
+    def read_fill_percent(self) -> float:
+        return self.fill_percent
+ 
+    def read_median_cm(self) -> float:
+        return self.bin_depth_cm * (1 - self.fill_percent / 100.0)
+ 
+    def is_full(self) -> bool:
+        return self.fill_percent >= (
+            (1 - self.full_threshold_cm / self.bin_depth_cm) * 100.0
+        )
+ 
+    def close(self) -> None:
+        pass
