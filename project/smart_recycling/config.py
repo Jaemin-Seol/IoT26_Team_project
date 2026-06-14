@@ -65,11 +65,38 @@ class UltrasonicConfig:
     sample_delay_seconds: float = 0.06
     timeout_seconds: float = 0.04
 
+@dataclass
+class TempHumidityConfig:
+    enabled: bool = True
+    pin: int = 4
+ 
+ 
+@dataclass
+class BinUltrasonicConfig:
+    enabled: bool = True
+    trigger_pin: int = 27
+    echo_pin: int = 22
+    bin_depth_cm: float = 40.0
+    full_threshold_cm: float = 10.0
+    timeout_seconds: float = 0.04
+    samples: int = 5
+    sample_delay_seconds: float = 0.06
+ 
 
 @dataclass
 class SensorsConfig:
     pir: PirConfig = field(default_factory=PirConfig)
     ultrasonic: UltrasonicConfig = field(default_factory=UltrasonicConfig)
+    temp_humidity: TempHumidityConfig = field(default_factory=TempHumidityConfig)
+    bin_ultrasonic: BinUltrasonicConfig = field(default_factory=BinUltrasonicConfig)
+
+
+@dataclass
+class FirebaseConfig:
+    enabled: bool = False
+    url: str = ""
+    timeout_seconds: float = 5.0
+    min_interval_seconds: float = 5.0
 
 
 @dataclass
@@ -80,6 +107,7 @@ class Config:
     display: DisplayConfig = field(default_factory=DisplayConfig)
     lcd: LcdConfig = field(default_factory=LcdConfig)
     sensors: SensorsConfig = field(default_factory=SensorsConfig)
+    firebase: FirebaseConfig = field(default_factory=FirebaseConfig)
 
 # Convert a string or Path into an expanded Path object
 def _path(value: str | Path) -> Path:
@@ -126,6 +154,10 @@ def load_config(path: str | Path = "config.toml") -> Config:
     sensors_data = data.get("sensors", {})
     _update_dataclass(config.sensors.pir, sensors_data.get("pir", {}))
     _update_dataclass(config.sensors.ultrasonic, sensors_data.get("ultrasonic", {}))
+    _update_dataclass(config.sensors.temp_humidity, sensors_data.get("temp_humidity", {}))
+    _update_dataclass(config.sensors.bin_ultrasonic, sensors_data.get("bin_ultrasonic", {}))
+
+    _update_dataclass(config.firebase, data.get("firebase", {}))
 
     model_path = Path(config.yolo.model).expanduser()
     if not model_path.is_absolute():

@@ -143,6 +143,21 @@ addresses = ["0x27", "0x3f"]
 [yolo]
 model = "yolov8n.pt"
 confidence = 0.35
+
+[sensors.temp_humidity]
+pin = 4        
+
+[sensors.bin_ultrasonic]
+trigger_pin = 25
+echo_pin = 8
+bin_depth_cm = 40.0
+full_threshold_cm = 10.0
+
+[firebase]
+enabled = true
+url = "https://smarttrash-dbf88-default-rtdb.asia-southeast1.firebasedatabase.app/"
+timeout_seconds = 5.0
+min_interval_seconds = 5.0
 ```
 
 ## 라즈베리파이 핀 번호 기준
@@ -444,6 +459,11 @@ YOLO 결과 이미지:
 
 ```sh
 tail -5 ~/IoT26_Team_project/project/events.jsonl
+```
+## 라즈베리파이 파이어베이스 설치
+
+```sh
+pip install firebase-admin --break-system-packages
 ```
 
 ## 설치 관련 주의
