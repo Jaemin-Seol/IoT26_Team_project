@@ -28,7 +28,7 @@ def main() -> int:
     else:
         image = np.zeros((480, 640, 3), dtype=np.uint8)
 
-    classifier = YoloClassifier(model_path, config.yolo.confidence, config.yolo.imgsz, config.yolo.top_k)
+    classifier = YoloClassifier(model_path, config.yolo.confidence, config.yolo.imgsz)
     result = classifier.classify(image, config.app.output_dir)
     print(f"[model] matched: {result.matched_label}")
     print(f"[model] advice: {result.advice.line1} / {result.advice.line2}")

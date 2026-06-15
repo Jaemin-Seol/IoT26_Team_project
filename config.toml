@@ -9,15 +9,14 @@ poll_interval_seconds = 0.12
 
 [camera]
 enabled = true
-width = 1280
-height = 720
+width = 320
+height = 320
 warmup_seconds = 1.0
 
 [yolo]
 model = "yolo26s_Finetuned.pt"
 confidence = 0.35
-imgsz = 640
-top_k = 5
+imgsz = 224
 
 [display]
 enabled = true
@@ -38,7 +37,7 @@ pin = 17
 enabled = true
 trigger_pin = 23
 echo_pin = 24
-object_distance_cm = 18.0
+object_distance_cm = 35.0
 stable_tolerance_cm = 2.5
 samples = 5
 sample_delay_seconds = 0.06

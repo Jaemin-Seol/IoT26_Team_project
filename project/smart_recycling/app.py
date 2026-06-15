@@ -46,7 +46,6 @@ class RecyclingApp:
             model_path=config.yolo.model,
             confidence=config.yolo.confidence,
             imgsz=config.yolo.imgsz,
-            top_k=config.yolo.top_k,
         )
         self.logger = EventLogger(config.app.log_path)
         self.firebase: FirebaseClient | None = (

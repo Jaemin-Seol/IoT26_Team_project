@@ -22,7 +22,6 @@ class YoloClassifier:
         self.model_path = model_path
         self.confidence = confidence
         self.imgsz = imgsz
-        self.top_k = top_k
         self._model = None
 
     # load the YOLO model on first use

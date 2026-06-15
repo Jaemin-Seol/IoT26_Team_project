@@ -26,8 +26,8 @@ class AppConfig:
 @dataclass
 class CameraConfig:
     enabled: bool = True
-    width: int = 1280
-    height: int = 720
+    width: int = 320
+    height: int = 320
     warmup_seconds: float = 1.0
 
 
@@ -35,8 +35,7 @@ class CameraConfig:
 class YoloConfig:
     model: str = "yolo26s_Finetuned.pt"
     confidence: float = 0.35
-    imgsz: int = 640
-    top_k: int = 5
+    imgsz: int = 224
 
 
 @dataclass
@@ -65,7 +64,7 @@ class UltrasonicConfig:
     enabled: bool = True
     trigger_pin: int = 23
     echo_pin: int = 24
-    object_distance_cm: float = 18.0
+    object_distance_cm: float = 35.0
     stable_tolerance_cm: float = 2.5
     samples: int = 5
     sample_delay_seconds: float = 0.06
