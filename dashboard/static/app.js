@@ -12,27 +12,6 @@ let wastePieChart;
 
 // Build charts using chart.js
 function createCharts() {
-    // Recent detection count chart
-    recentChart = new Chart(document.getElementById("recentChart"), {
-        type: "bar",
-        data: {
-            labels: [],
-            datasets: [{
-                label: "Detection Count",
-                data: [],
-                //Bar color
-                backgroundColor: "rgba(46, 159, 110, 0.85)",
-                borderColor: "rgba(46, 159, 110, 1)",
-                borderWidth: 1,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
     // Waste type ratio chart
     wastePieChart = new Chart(document.getElementById("wastePieChart"), {
         type: "pie",
@@ -80,20 +59,20 @@ async function fetchDashboardData() {
     }
 }
 
+// Generate AI insight on demand
+async function generateInsight() {
+    try {
+        await fetch("/api/generate-insight", {
+            method: "POST"
+        });
+    } catch (error) {
+        console.error("Generate insight failed:", error);
+    }
+}
+
 //
 // Functions to update dashboard data and charts
 //
-function updateRecentChart(recentCounts) {
-    const entries = Object.entries(recentCounts);
-
-    const labels = entries.map(entry => entry[0]);
-    const values = entries.map(entry => entry[1]);
-
-    recentChart.data.labels = labels;
-    recentChart.data.datasets[0].data = values;
-    recentChart.update();
-}
-
 function updateWastePieChart(wasteTypes) {
     const labels = Object.keys(wasteTypes);
     const values = Object.values(wasteTypes);
@@ -114,13 +93,10 @@ function updateDashboard(data) {
     document.getElementById("total-count").textContent =
         data.total_count;
 
-    document.getElementById("bin-capacity").textContent =
-        `${data.capacity} %`;
-
     document.getElementById("capacity-text").textContent =
         `${data.capacity}%`;
 
-    document.getElementById("capacity-bar").style.width =
+    document.getElementById("capacity-bar").style.height =
         `${data.capacity}%`;
 
     document.getElementById("bin-status").textContent =
@@ -129,7 +105,6 @@ function updateDashboard(data) {
     document.getElementById("ai-insight").textContent =
         data.insight;
 
-    updateRecentChart(data.recent_counts);
     updateWastePieChart(data.waste_types);
 
     const badge =
@@ -151,13 +126,10 @@ function setOffline() {
     document.getElementById("total-count").textContent =
         "--";
 
-    document.getElementById("bin-capacity").textContent =
-        "-- %";
-
     document.getElementById("capacity-text").textContent =
         "--%";
 
-    document.getElementById("capacity-bar").style.width =
+    document.getElementById("capacity-bar").style.height =
         "0%";
 
     document.getElementById("bin-status").textContent =
@@ -173,11 +145,14 @@ function setOffline() {
 
     badge.classList.remove("online");
     badge.classList.add("offline");
-
-    updateRecentChart({});
+    
     updateWastePieChart({});
 }
 
 createCharts();
 fetchDashboardData();
 setInterval(fetchDashboardData, 5000); // 5 sec interval
+
+document
+    .getElementById("generate-insight-btn")
+    .addEventListener("click", generateInsight);

@@ -18,7 +18,7 @@ from google import genai
 
 # Initialize global variables
 INSIGHT_REFRESH_INTERVAL = 300 # 5 minute
-ENABLE_AI = False
+ENABLE_AI = True
 USE_MOCK_DATA = False
 
 load_dotenv()
@@ -49,13 +49,14 @@ def call_llm(data):
         raise ValueError("GEMINI_API_KEY is not set")
     
     prompt = f"""
-Generate one concise operational insight for a smart recycling dashboard.
+Generate concise operational insight for a smart recycling dashboard.
 
 Rules:
-- One sentence only.
-- Maximum 20 words.
+- 3 sentence only.
+- Maximum 50 words.
 - Focus on the most important issue.
 - If no issue exists, state that the system is operating normally.
+- Waste Types is number of waste. (Not a portion)
 
 Sensor Data:
 {data}
@@ -167,6 +168,14 @@ def get_status():
             "success": False,
             "error": str(e)
         }), 500
+
+# Reset time to generate insight
+@app.route("/api/generate-insight", methods=["POST"])
+def generate_insight():
+    global LAST_INSIGHT_TIME
+    LAST_INSIGHT_TIME = 0
+
+    return jsonify({"success": True})
 
 # open default browser
 def open_browser():

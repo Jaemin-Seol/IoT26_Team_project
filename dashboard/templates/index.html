@@ -22,7 +22,7 @@ Team C
     <main class="dashboard">
         <header class="header card">
             <img
-                src="{{ url_for('static', filename='images/Gachon_logo.png') }}"
+                src="{{ url_for('static', filename='Gachon_logo.png') }}"
                 alt="Logo"
                 class="logo">
             <div>
@@ -55,7 +55,7 @@ Team C
                 <p id="ai-insight" class="insight-text">
                     No insight data yet.
                 </p>
-
+                <button id="generate-insight-btn" type="button" class="generate-btn">Generate Now</button>
                 <p class="insight-disclaimer">
                     AI insights are powered by Google's Gemini model. Gemini is AI and can make mistakes.
                 </p>
@@ -66,7 +66,7 @@ Team C
                 <canvas id="wastePieChart"></canvas>
             </div>
 
-            <div class="card capacity-box"">
+            <div class="card capacity-box">
                 <h3>Bin Status</h3>
                 <div class="capacity-header">
                     <span>Current Capacity</span>
