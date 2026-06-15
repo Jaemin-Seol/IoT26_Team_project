@@ -58,13 +58,13 @@ class RecyclingApp:
             else None
         )
         self._waste_counts = {
-            "Battery": 1,
-            "Food Waste": 20,
+            "Battery": 0,
+            "Food Waste": 0,
             "Cardboard": 0,
-            "Clothes": 1,
-            "Glass": 100,
+            "Clothes": 0,
+            "Glass": 0,
             "Metal": 0,
-            "Paper": 300,
+            "Paper": 0,
             "Plastic": 0,
             "General Waste": 0,
             "Vinyl": 0,
