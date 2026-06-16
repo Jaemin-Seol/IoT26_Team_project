@@ -123,7 +123,7 @@ stable_tolerance_cm = 2.5
 
 ## YOLO Model Fine-Tuning
 
-The yolo26s-cls model was fine-tuned on a custom dataset consisting of 10 waste classification categories.
+The YOLO26s-CLS model was fine-tuned on a custom dataset with 10 waste categories, which were grouped into 4 broader recycling classes.
 
 ```text
 Glass
