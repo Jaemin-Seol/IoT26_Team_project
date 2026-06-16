@@ -17,77 +17,109 @@ class RecyclingAdvice:
     line2: str        # advice
     detail: str       
 
-RULES: dict[str, RecyclingAdvice] = {
-    "battery": RecyclingAdvice(
-        "battery",
-        "Battery",
-        "Battery Box",
-        "Use a battery collection box."
-    ),
-
-    "biological": RecyclingAdvice(
-        "biological",
-        "Food Waste",
-        "Food Bin",
-        "Drain liquid and dispose as food waste."
-    ),
-
-    "cardboard": RecyclingAdvice(
-        "cardboard",
-        "Cardboard",
-        "Paper Bin",
-        "Flatten before disposal."
-    ),
-
-    "clothes": RecyclingAdvice(
-        "clothes",
-        "Clothes",
-        "Donation Bin",
-        "Donate if reusable, otherwise dispose appropriately."
-    ),
-
-    "glass": RecyclingAdvice(
-        "glass",
-        "Glass",
-        "Glass Bin",
-        "Rinse and place in the glass recycling bin."
-    ),
-
-    "metal": RecyclingAdvice(
-        "metal",
-        "Metal",
-        "Metal Bin",
-        "Rinse and place in the metal recycling bin."
-    ),
-
-    "paper": RecyclingAdvice(
-        "paper",
-        "Paper",
-        "Paper Bin",
-        "Keep dry and place in the paper recycling bin."
+# 4 Class Rule
+RULES: dict[str, RecyclingAdvice] =  {
+    "general": RecyclingAdvice(
+        "general",
+        "General Waste",
+        "Non-Recyclable",
+        "Dispose as general waste."
     ),
 
     "plastic": RecyclingAdvice(
         "plastic",
         "Plastic",
-        "Plastic Bin",
+        "Rinse & Recycle",
         "Rinse and place in the plastic recycling bin."
     ),
 
-    "trash": RecyclingAdvice(
-        "trash",
-        "General Waste",
-        "Trash Bin",
-        "Dispose as general waste."
+    "glass": RecyclingAdvice(
+        "glass",
+        "Glass",
+        "Remove Caps",
+        "Rinse and place in the glass recycling bin."
     ),
 
-    "vinyl": RecyclingAdvice(
-        "vinyl",
-        "Vinyl",
-        "Vinyl Bin",
-        "Clean and dry before disposal."
+    "metal": RecyclingAdvice(
+        "metal",
+        "Can/Metal",
+        "Empty & Clean",
+        "Rinse and place in the metal recycling bin."
     ),
 }
+
+# 10 Class Rule
+# RULES: dict[str, RecyclingAdvice] = {
+#     "battery": RecyclingAdvice(
+#         "battery",
+#         "Battery",
+#         "Battery Box",
+#         "Use a battery collection box."
+#     ),
+
+#     "biological": RecyclingAdvice(
+#         "biological",
+#         "Food Waste",
+#         "Food Bin",
+#         "Drain liquid and dispose as food waste."
+#     ),
+
+#     "cardboard": RecyclingAdvice(
+#         "cardboard",
+#         "Cardboard",
+#         "Paper Bin",
+#         "Flatten before disposal."
+#     ),
+
+#     "clothes": RecyclingAdvice(
+#         "clothes",
+#         "Clothes",
+#         "Donation Bin",
+#         "Donate if reusable, otherwise dispose appropriately."
+#     ),
+
+#     "glass": RecyclingAdvice(
+#         "glass",
+#         "Glass",
+#         "Glass Bin",
+#         "Rinse and place in the glass recycling bin."
+#     ),
+
+#     "metal": RecyclingAdvice(
+#         "metal",
+#         "Metal",
+#         "Metal Bin",
+#         "Rinse and place in the metal recycling bin."
+#     ),
+
+#     "paper": RecyclingAdvice(
+#         "paper",
+#         "Paper",
+#         "Paper Bin",
+#         "Keep dry and place in the paper recycling bin."
+#     ),
+
+#     "plastic": RecyclingAdvice(
+#         "plastic",
+#         "Plastic",
+#         "Plastic Bin",
+#         "Rinse and place in the plastic recycling bin."
+#     ),
+
+#     "trash": RecyclingAdvice(
+#         "trash",
+#         "General Waste",
+#         "Trash Bin",
+#         "Dispose as general waste."
+#     ),
+
+#     "vinyl": RecyclingAdvice(
+#         "vinyl",
+#         "Vinyl",
+#         "Vinyl Bin",
+#         "Clean and dry before disposal."
+#     ),
+# }
 
 UNKNOWN_ADVICE = RecyclingAdvice(
     category="unknown",
@@ -103,7 +135,25 @@ NO_OBJECT_ADVICE = RecyclingAdvice(
 )
 
 def normalize_label(label: str) -> str:
-    return label.strip().lower().replace("_", " ")
+    normalized = label.strip().lower().replace("_", " ")
+
+    # Mapping table for 4 Class
+    category_map = {
+        "battery": "general",
+        "biological": "general",
+        "cardboard": "general",
+        "clothes": "general",
+        "paper": "general",
+        "trash": "general",
+        "vinyl": "general",
+
+        "plastic": "plastic",
+        "glass": "glass",
+        "metal": "metal",
+    }
+
+    return category_map.get(normalized, normalized)
+
 
 # label - advice mapping
 def advice_for(label: str | None) -> RecyclingAdvice:

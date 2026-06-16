@@ -70,6 +70,7 @@ class RecyclingApp:
             "Vinyl": 0,
         }
         self._total_count: int = 0
+        self._last_idle_env_display = 0.0
 
     # Clean up
     def close(self) -> None:
@@ -93,7 +94,7 @@ class RecyclingApp:
         # Generate Thread to push data to cloud
         threading.Thread(target=self._firebase_worker, daemon=True,).start()
 
-        self.display.show("Ready", "Place item")
+        self._show_idle_status(force=True)
         self.sensors.lid.close()
         print("[INFO] System ready. Press Ctrl-C to stop.")
         try:
@@ -105,16 +106,35 @@ class RecyclingApp:
                     self.display.show("Cancelled", "Item moved")
                     print("[INFO] Capture cancelled because the item was moved.")
                     time.sleep(1.0)
-                    self.display.show("Ready", "Place item")
+                    self._show_idle_status(force=True)
                     continue
 
                 image, raw_path = self.camera.capture(self.config.app.output_dir)
                 self._classify(image, raw_path)
                 time.sleep(self.config.app.cooldown_seconds)
-                self.display.show("Ready", "Place item")
+                self._show_idle_status(force=True)
                 self.sensors.lid.close()
         except KeyboardInterrupt:
             print("\n[INFO] stopped")
+
+    # Show humidity and display
+    def _show_idle_status(self, force: bool = False) -> None:
+        now = time.monotonic()
+        if not force and now - self._last_idle_env_display < 5.0:
+            return
+        self._last_idle_env_display = now
+
+        if self.sensors.temp_humidity is None:
+            self.display.show("Ready", f"---C  ---%")
+            return
+
+        reading = self.sensors.temp_humidity.read()
+        if reading is None:
+            self.display.show("Ready", f"---C  ---%")
+            return
+
+        temp, humidity = reading
+        self.display.show("Ready", f"{temp:.1f}C  {humidity:.1f}%")
 
     # Wait until motion and a valid target object are detected
     def _wait_for_candidate(self) -> dict | None:
@@ -124,6 +144,7 @@ class RecyclingApp:
 
         while True:
             if pir is not None and not pir.is_motion_detected():
+                self._show_idle_status()
                 time.sleep(config.app.poll_interval_seconds)
                 continue
 
@@ -141,7 +162,7 @@ class RecyclingApp:
             print("[INFO] Motion seen, but no stable object in target area.")
             self.display.show("No item", "Try again")
             time.sleep(1.0)
-            self.display.show("Ready", "Place item")
+            self._show_idle_status(force=True)
     
     # Verify that the object remains stable before capture
     def _wait_for_stable_object(self) -> dict | None:
