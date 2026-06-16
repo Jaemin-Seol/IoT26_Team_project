@@ -54,6 +54,12 @@ Navigate to the project directory on the Raspberry Pi.
 python project/run.py
 ```
 
+Make '.env' and put you firebase RDB URL and Gemini api key.
+```
+FIREBASE_URL=YOUR_FIREBASE_URL
+GEMINI_API_KEY=YOUR_API_KEY
+```
+
 After starting the dashboard server, open a web browser and navigate to the reported address (127.0.0.1:5000) to view the dashboard.
 ```sh
 python dashboard/app.py
