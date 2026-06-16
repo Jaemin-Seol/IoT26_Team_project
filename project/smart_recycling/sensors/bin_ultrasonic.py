@@ -28,7 +28,7 @@ class BinUltrasonicSensor(UltrasonicSensor):
         """Return fill percentage (0.0 ~ 100.0) or None on failure."""
         distance = self.read_median_cm()
         if distance is None:
-            return None
+            return -1
         filled = self.bin_depth_cm - distance
         percent = (filled / self.bin_depth_cm) * 100.0
         return max(0.0, min(100.0, round(percent, 1)))
