@@ -56,7 +56,7 @@ python project/run.py
 
 After starting the dashboard server, open a web browser and navigate to the reported address (127.0.0.1:5000) to view the dashboard.
 ```sh
-python dashboard/run.py
+python dashboard/app.py
 ```
 
 Note: It is recommended to use a combination of system packages and a Python virtual environment (venv) when installing dependencies. Some packages may have compatibility issues on Raspberry Pi 5, and certain libraries are more stable when installed through the system package manager.
@@ -126,16 +126,10 @@ stable_tolerance_cm = 2.5
 The yolo26s-cls model was fine-tuned on a custom dataset consisting of 10 waste classification categories.
 
 ```text
-Battery
-Biological
-Cardboard
-Clothes
 Glass
 Metal
-Paper
 Plastic
 Trash
-Vinyl
 ```
 
 By using a dedicated classification model instead of a general-purpose pretrained model, the inference pipeline could be simplified significantly. This approach reduced implementation complexity while also providing better classification performance for the target recycling categories.
